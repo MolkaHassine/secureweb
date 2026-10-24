@@ -1,0 +1,19 @@
+<?php
+
+use App\EventSubscriber\SecurityEventSubscriber;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+return static function (ContainerConfigurator $container): void {
+    $services = $container->services()
+        ->defaults()
+            ->autowire()
+            ->autoconfigure();
+
+    $services->load('App\\', '../src/')
+        ->exclude('../src/DependencyInjection/')
+        ->exclude('../src/Entity/')
+        ->exclude('../src/Kernel.php');
+
+    $services->set(SecurityEventSubscriber::class)
+        ->tag('kernel.event_subscriber');
+};

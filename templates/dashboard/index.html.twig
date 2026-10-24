@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - SecureWeb{% endblock %}
+
+{% block body %}
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <span>🛡️ SecureWeb</span>
+        </div>
+        <div class="nav-menu">
+            <span class="nav-user">{{ app.user.email }}</span>
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_audit') }}" class="nav-link">Journal d'audit</a>
+            {% endif %}
+            <a href="{{ path('app_logout') }}" class="nav-link">Déconnexion</a>
+        </div>
+    </div>
+</nav>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Tableau de bord sécurisé</h1>
+        <p>Bienvenue, {{ app.user.email }}</p>
+    </div>
+
+    <div class="cards-grid">
+        <div class="card">
+            <div class="card-icon">🔐</div>
+            <h3>Authentification</h3>
+            <p>Connexion sécurisée avec hachage bcrypt/argon2, protection CSRF et sessions</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">🛡️</div>
+            <h3>Protection</h3>
+            <p>Contrôle d'accès basé sur les rôles (RBAC), gestion des sessions</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">📊</div>
+            <h3>Journalisation</h3>
+            <p>Traçabilité complète des actions et tentatives de connexion</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">✅</div>
+            <h3>Validation</h3>
+            <p>Validation des formulaires et entités avec Symfony Validator</p>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <h2>Informations de sécurité</h2>
+        <ul>
+            <li><strong>Statut compte :</strong> {{ app.user.isVerified ? 'Vérifié' : 'Non vérifié' }}</li>
+            <li><strong>Rôles :</strong> {{ app.user.roles|join(', ') }}</li>
+            <li><strong>Dernière connexion :</strong> {{ app.user.lastLoginAt ? app.user.lastLoginAt|date('d/m/Y H:i:s') : 'Première connexion' }}</li>
+            <li><strong>Compte créé le :</strong> {{ app.user.createdAt|date('d/m/Y H:i:s') }}</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Journal d'audit - SecureWeb{% endblock %}
+
+{% block body %}
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <span>🛡️ SecureWeb</span>
+        </div>
+        <div class="nav-menu">
+            <a href="{{ path('app_dashboard') }}" class="nav-link">Tableau de bord</a>
+            <span class="nav-user">{{ app.user.email }}</span>
+            <a href="{{ path('app_logout') }}" class="nav-link">Déconnexion</a>
+        </div>
+    </div>
+</nav>
+
+<div class="audit-container">
+    <div class="audit-header">
+        <h1>Journal d'audit & Surveillance</h1>
+        <p>Traçabilité des actions et tentatives d'authentification</p>
+    </div>
+
+    <section class="audit-section">
+        <h2>Actions utilisateurs (50 dernières)</h2>
+        <div class="table-wrapper">
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Date/Heure</th>
+                        <th>Utilisateur</th>
+                        <th>Action</th>
+                        <th>Ressource</th>
+                        <th>IP</th>
+                        <th>Détails</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in auditLogs %}
+                        <tr>
+                            <td>{{ log.loggedAt|date('d/m/Y H:i:s') }}</td>
+                            <td>{{ log.user ? log.user.email : '-' }}</td>
+                            <td><span class="badge">{{ log.action }}</span></td>
+                            <td>{{ log.resource }}</td>
+                            <td>{{ log.ipAddress }}</td>
+                            <td>{{ log.details }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="no-data">Aucun log enregistré</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="audit-section">
+        <h2>Tentatives de connexion (50 dernières)</h2>
+        <div class="table-wrapper">
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Date/Heure</th>
+                        <th>Email</th>
+                        <th>Statut</th>
+                        <th>IP</th>
+                        <th>User-Agent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for attempt in loginAttempts %}
+                        <tr>
+                            <td>{{ attempt.attemptedAt|date('d/m/Y H:i:s') }}</td>
+                            <td>{{ attempt.email }}</td>
+                            <td>
+                                {% if attempt.successful %}
+                                    <span class="badge badge-success">Réussie</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Échouée</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ attempt.ipAddress }}</td>
+                            <td class="ua">{{ attempt.userAgent|slice(0, 60) }}{% if attempt.userAgent|length > 60 %}...{% endif %}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="no-data">Aucune tentative enregistrée</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}
